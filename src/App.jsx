@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/auth/Login'
 import Dashboard from './pages/dashboard/Dashboard'
 import Students from './pages/students/Students'
+import StudentProfile from './pages/students/StudentProfile'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/activities" element={<ProtectedRoute><div className="p-8">Activities Coming Soon</div></ProtectedRoute>} />
           <Route path="/timetable" element={<ProtectedRoute><div className="p-8">Timetable Coming Soon</div></ProtectedRoute>} />
           <Route path="/communication" element={<ProtectedRoute><div className="p-8">Communication Coming Soon</div></ProtectedRoute>} />
+          <Route path="/students/:id" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

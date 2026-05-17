@@ -25,12 +25,14 @@ export default function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={
-            <ProtectedRoute><Dashboard /></ProtectedRoute>
-          } />
-          <Route path="/students" element={
-            <ProtectedRoute><Students /></ProtectedRoute>
-          } />
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
+          <Route path="/attendance" element={<ProtectedRoute><div className="p-8">Attendance Coming Soon</div></ProtectedRoute>} />
+          <Route path="/grades" element={<ProtectedRoute><div className="p-8">Grades Coming Soon</div></ProtectedRoute>} />
+          <Route path="/fees" element={<ProtectedRoute><div className="p-8">Fees Coming Soon</div></ProtectedRoute>} />
+          <Route path="/activities" element={<ProtectedRoute><div className="p-8">Activities Coming Soon</div></ProtectedRoute>} />
+          <Route path="/timetable" element={<ProtectedRoute><div className="p-8">Timetable Coming Soon</div></ProtectedRoute>} />
+          <Route path="/communication" element={<ProtectedRoute><div className="p-8">Communication Coming Soon</div></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

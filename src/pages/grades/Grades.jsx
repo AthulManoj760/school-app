@@ -137,7 +137,7 @@ export default function Grades() {
             <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 print:hidden">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">Grades</h1>
                         <p className="text-gray-400 text-sm mt-1">Manage student grades and report cards</p>
@@ -151,7 +151,7 @@ export default function Grades() {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6 print:hidden">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Select Class</label>
@@ -185,8 +185,14 @@ export default function Grades() {
 
                 {selectedStudent && (
                     <>
+                        {/* Print Header */}
+                        <div className="hidden print:block text-center mb-8 border-b-2 border-gray-800 pb-6 mt-4">
+                            <h1 className="text-4xl font-bold text-gray-900 mb-2">School Report Card</h1>
+                            <p className="text-xl text-gray-600">Academic Year: {grades[0]?.academic_year || '2025-2026'}</p>
+                        </div>
+
                         {/* Student Summary Card */}
-                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6 print:shadow-none print:border-2 print:border-gray-200 print:mb-8">
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-blue-600">
@@ -197,28 +203,37 @@ export default function Grades() {
                                         <p className="text-sm text-gray-400">Roll: {selectedStudentData?.roll_number || 'N/A'}</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-6 text-center">
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-800">{grades.length}</p>
-                                        <p className="text-xs text-gray-400">Exams</p>
+                                <div className="flex items-center gap-6 text-center">
+                                    <div className="flex gap-6">
+                                        <div>
+                                            <p className="text-2xl font-bold text-gray-800">{grades.length}</p>
+                                            <p className="text-xs text-gray-400">Exams</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-2xl font-bold text-gray-800">{overallPercent}%</p>
+                                            <p className="text-xs text-gray-400">Overall</p>
+                                        </div>
+                                        <div>
+                                            <span className={`text-2xl font-bold px-3 py-1 rounded-xl ${getGradeColor(overallGrade)} print:border print:border-gray-300`}>
+                                                {overallGrade}
+                                            </span>
+                                            <p className="text-xs text-gray-400 mt-1">Grade</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-2xl font-bold text-gray-800">{overallPercent}%</p>
-                                        <p className="text-xs text-gray-400">Overall</p>
-                                    </div>
-                                    <div>
-                                        <span className={`text-2xl font-bold px-3 py-1 rounded-xl ${getGradeColor(overallGrade)}`}>
-                                            {overallGrade}
-                                        </span>
-                                        <p className="text-xs text-gray-400 mt-1">Grade</p>
-                                    </div>
+                                    {/* Print Button */}
+                                    <button
+                                        onClick={() => window.print()}
+                                        className="print:hidden ml-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition flex items-center gap-2 text-sm border border-gray-200 shadow-sm"
+                                    >
+                                        🖨️ Print
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Grades Table */}
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="p-5 border-b border-gray-100">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden print:shadow-none print:border-2 print:border-gray-200">
+                            <div className="p-5 border-b border-gray-100 print:bg-gray-50">
                                 <h2 className="font-semibold text-gray-800">Grade Records</h2>
                             </div>
                             {loading ? (
@@ -277,7 +292,7 @@ export default function Grades() {
                 )}
 
                 {!selectedStudent && (
-                    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+                    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 print:hidden">
                         <p className="text-4xl mb-3">📝</p>
                         <p className="text-gray-500 font-medium">Select a class and student to view grades</p>
                     </div>

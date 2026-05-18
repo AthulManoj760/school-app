@@ -24,43 +24,41 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="min-h-screen bg-zinc-900 bg-gradient-to-br from-zinc-900 via-violet-950 to-indigo-950 flex items-center justify-center p-4">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-md p-8">
 
                 {/* Logo & Title */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <span className="text-white text-2xl">🏫</span>
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-800">School Manager</h1>
-                    <p className="text-gray-500 mt-1">Sign in to your account</p>
+                    <img src="/logo.png" alt="Omnia Logo" className="w-20 h-20 rounded-2xl mx-auto mb-5 object-cover shadow-xl shadow-violet-500/20" />
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Omnia</h1>
+                    <p className="text-zinc-300 mt-1">Sign in to your workspace</p>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-zinc-300 mb-1.5">
                             Email Address
                         </label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-white placeholder-zinc-500 transition-all"
                             placeholder="admin@school.com"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-zinc-300 mb-1.5">
                             Password
                         </label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-white placeholder-zinc-500 transition-all"
                             placeholder="••••••••"
                             required
                         />
@@ -69,14 +67,14 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition duration-200"
+                        className="w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 disabled:from-violet-500/50 text-white font-semibold py-3 rounded-xl transition duration-300 shadow-lg shadow-violet-500/25"
                     >
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-gray-400 mt-6">
-                    School Management System v1.0
+                <p className="text-center text-xs font-semibold text-zinc-500 uppercase tracking-widest mt-8">
+                    Omnia Management System
                 </p>
             </div>
         </div>

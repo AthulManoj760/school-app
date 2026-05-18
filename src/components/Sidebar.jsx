@@ -49,12 +49,10 @@ export default function Sidebar({ isOpen, onClose }) {
       `}>
                 {/* Logo */}
                 <div className="flex items-center gap-3 p-6 border-b border-white/40">
-                    <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20">
-                        <School className="text-white w-5 h-5" />
-                    </div>
+                    <img src="/logo.png" alt="Omnia Logo" className="w-10 h-10 rounded-xl object-cover shadow-sm" />
                     <div>
-                        <h1 className="font-bold text-zinc-800 text-sm tracking-tight">School Manager</h1>
-                        <p className="text-xs text-zinc-400 font-medium">Admin Panel</p>
+                        <h1 className="font-bold text-zinc-800 text-sm tracking-tight">Omnia</h1>
+                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Workspace</p>
                     </div>
                 </div>
 

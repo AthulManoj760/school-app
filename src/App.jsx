@@ -12,6 +12,7 @@ import Activities from './pages/activities/Activities'
 import Timetable from './pages/timetable/Timetable'
 import Communication from './pages/communication/Communication'
 import Classes from './pages/classes/Classes'
+import Teachers from './pages/teachers/Teachers'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -43,6 +44,8 @@ export default function App() {
           <Route path="/students/:id" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
           <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
           <Route path="/classes" element={<ProtectedRoute><Classes /></ProtectedRoute>} />
+          <Route path="/teachers" element={<ProtectedRoute><Teachers /></ProtectedRoute>} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

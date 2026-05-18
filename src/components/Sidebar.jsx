@@ -6,6 +6,7 @@ const menuItems = [
     { path: '/', icon: '📊', label: 'Dashboard' },
     { path: '/students', icon: '👨‍🎓', label: 'Students' },
     { path: '/classes', icon: '🏫', label: 'Classes' },
+    { path: '/teachers', icon: '👩‍🏫', label: 'Teachers' },
     { path: '/attendance', icon: '✅', label: 'Attendance' },
     { path: '/grades', icon: '📝', label: 'Grades' },
     { path: '/fees', icon: '💰', label: 'Fees' },

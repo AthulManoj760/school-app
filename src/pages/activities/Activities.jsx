@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import { supabase } from '../../supabase'
 import toast from 'react-hot-toast'
+import { Trophy, Users, Plus, UserPlus, Calendar, Medal, Activity, Music, Palette, FlaskConical, Building, Tent, Sparkles, X } from 'lucide-react'
 
 export default function Activities() {
     const [activities, setActivities] = useState([])
@@ -122,69 +123,76 @@ export default function Activities() {
     }
 
     const activityTypeConfig = {
-        sports: { color: 'bg-green-100 text-green-700', icon: '⚽' },
-        arts: { color: 'bg-purple-100 text-purple-700', icon: '🎨' },
-        music: { color: 'bg-blue-100 text-blue-700', icon: '🎵' },
-        science: { color: 'bg-yellow-100 text-yellow-700', icon: '🔬' },
-        club: { color: 'bg-orange-100 text-orange-700', icon: '🏛️' },
-        cultural: { color: 'bg-pink-100 text-pink-700', icon: '🎭' },
-        other: { color: 'bg-gray-100 text-gray-700', icon: '🌟' },
+        sports: { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: Activity },
+        arts: { color: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200', icon: Palette },
+        music: { color: 'bg-sky-50 text-sky-700 border-sky-200', icon: Music },
+        science: { color: 'bg-amber-50 text-amber-700 border-amber-200', icon: FlaskConical },
+        club: { color: 'bg-indigo-50 text-indigo-700 border-indigo-200', icon: Building },
+        cultural: { color: 'bg-rose-50 text-rose-700 border-rose-200', icon: Tent },
+        other: { color: 'bg-zinc-50 text-zinc-700 border-zinc-200', icon: Sparkles },
     }
 
     const getTypeConfig = (type) => activityTypeConfig[type] || activityTypeConfig.other
 
     return (
         <Layout>
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Activities & Clubs</h1>
-                        <p className="text-gray-400 text-sm mt-1">Manage extracurricular activities</p>
+                        <h1 className="text-3xl font-bold text-zinc-800 tracking-tight">Activities & Clubs</h1>
+                        <p className="text-zinc-500 mt-1">Manage extracurricular activities</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <button
                             onClick={() => setShowEnrollModal(true)}
-                            className="border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2.5 rounded-xl font-medium transition text-sm"
+                            className="btn-glass px-4 py-2"
                         >
-                            👤 Enroll Student
+                            <UserPlus className="w-5 h-5" />
+                            <span className="hidden sm:inline">Enroll Student</span>
                         </button>
                         <button
                             onClick={() => setShowActivityModal(true)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
+                            className="btn-primary"
                         >
-                            ➕ New Activity
+                            <Trophy className="w-5 h-5" />
+                            <span>New Activity</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Summary */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                    {Object.entries(activityTypeConfig).slice(0, 4).map(([type, config]) => (
-                        <div key={type} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
-                            <span className="text-2xl">{config.icon}</span>
-                            <p className="text-xl font-bold text-gray-800 mt-2">
-                                {activities.filter(a => a.type === type).length}
-                            </p>
-                            <p className="text-xs text-gray-400 capitalize">{type}</p>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {Object.entries(activityTypeConfig).slice(0, 4).map(([type, config]) => {
+                        const Icon = config.icon;
+                        return (
+                            <div key={type} className="glass-panel p-4 text-center hover:-translate-y-1 transition-transform">
+                                <div className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-inner ${config.color}`}>
+                                    <Icon className="w-6 h-6" />
+                                </div>
+                                <p className="text-2xl font-bold text-zinc-800 tracking-tight">
+                                    {activities.filter(a => a.type === type).length}
+                                </p>
+                                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-1">{type}</p>
+                            </div>
+                        )
+                    })}
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 mb-6">
+                <div className="flex gap-2 glass-panel p-1 w-fit border-white/50">
                     <button
                         onClick={() => setViewMode('activities')}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'activities' ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 ${viewMode === 'activities' ? 'bg-violet-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                     >
-                        🏆 Activities
+                        <Trophy className="w-4 h-4" /> Activities
                     </button>
                     <button
                         onClick={() => setViewMode('enrollments')}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'enrollments' ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 ${viewMode === 'enrollments' ? 'bg-violet-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                     >
-                        👥 Enrollments
+                        <Users className="w-4 h-4" /> Enrollments
                     </button>
                 </div>
 
@@ -192,41 +200,46 @@ export default function Activities() {
                 {viewMode === 'activities' && (
                     loading ? (
                         <div className="flex items-center justify-center py-16">
-                            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : activities.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-                            <p className="text-4xl mb-3">🏆</p>
-                            <p className="text-gray-500 font-medium">No activities yet</p>
-                            <p className="text-gray-400 text-sm mt-1">Click "New Activity" to create one</p>
+                        <div className="text-center py-16 glass-panel">
+                            <Trophy className="w-16 h-16 mx-auto text-zinc-300 mb-4" />
+                            <p className="text-zinc-500 font-medium">No activities yet</p>
+                            <p className="text-zinc-400 text-sm mt-1">Click "New Activity" to create one</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {activities.map(activity => {
                                 const config = getTypeConfig(activity.type)
+                                const Icon = config.icon
                                 const enrollCount = studentActivities.filter(sa => sa.activity_id === activity.id).length
                                 return (
-                                    <div key={activity.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <span className="text-3xl">{config.icon}</span>
-                                            <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${config.color}`}>
+                                    <div key={activity.id} className="glass-panel p-5 hover:-translate-y-1 hover:shadow-violet-500/10 flex flex-col group transition-all duration-300">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${config.color}`}>
+                                                <Icon className="w-6 h-6" />
+                                            </div>
+                                            <span className={`text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border ${config.color}`}>
                                                 {activity.type}
                                             </span>
                                         </div>
-                                        <h3 className="font-semibold text-gray-800 mb-1">{activity.name}</h3>
-                                        <p className="text-sm text-gray-400 mb-3 line-clamp-2">{activity.description || 'No description'}</p>
-                                        <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-50">
-                                            <span>👥 {enrollCount} enrolled</span>
-                                            <span>📅 {activity.date || 'No date'}</span>
+                                        <h3 className="text-xl font-bold text-zinc-800 tracking-tight mb-2">{activity.name}</h3>
+                                        <p className="text-sm text-zinc-500 mb-4 line-clamp-2 flex-1">{activity.description || 'No description'}</p>
+                                        
+                                        <div className="flex items-center justify-between text-xs font-medium text-zinc-500 pt-4 border-t border-white/50 mt-auto">
+                                            <span className="flex items-center gap-1.5"><Users className="w-4 h-4" /> {enrollCount} enrolled</span>
+                                            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {activity.date || 'No date'}</span>
                                         </div>
+                                        
                                         <button
                                             onClick={() => {
                                                 setEnrollForm({ ...enrollForm, activity_id: activity.id })
                                                 setShowEnrollModal(true)
                                             }}
-                                            className="w-full mt-3 py-2 border border-blue-200 text-blue-600 rounded-xl text-xs font-medium hover:bg-blue-50 transition"
+                                            className="w-full mt-4 py-2.5 bg-white hover:bg-violet-50 text-violet-600 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm border border-transparent hover:border-violet-100 opacity-100 lg:opacity-0 group-hover:opacity-100"
                                         >
-                                            + Enroll Student
+                                            <UserPlus className="w-4 h-4" /> Enroll Student
                                         </button>
                                     </div>
                                 )
@@ -237,48 +250,48 @@ export default function Activities() {
 
                 {/* Enrollments Tab */}
                 {viewMode === 'enrollments' && (
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-5 border-b border-gray-100">
-                            <h2 className="font-semibold text-gray-800">Student Enrollments</h2>
+                    <div className="glass-panel overflow-hidden">
+                        <div className="p-5 border-b border-white/50 bg-white/30 backdrop-blur-sm">
+                            <h2 className="font-bold text-zinc-800 tracking-tight">Student Enrollments</h2>
                         </div>
                         {studentActivities.length === 0 ? (
                             <div className="text-center py-16">
-                                <p className="text-4xl mb-3">👥</p>
-                                <p className="text-gray-500">No enrollments yet</p>
+                                <Users className="w-16 h-16 mx-auto text-zinc-300 mb-4" />
+                                <p className="text-zinc-500">No enrollments yet</p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto custom-scrollbar">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-gray-50">
+                                    <thead className="bg-white/40 border-b border-white">
                                         <tr>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Student</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Activity</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Type</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Role</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Achievement</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Student</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Activity</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Type</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Role</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Achievement</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {studentActivities.map((sa, i) => {
+                                    <tbody className="divide-y divide-white/50">
+                                        {studentActivities.map((sa) => {
                                             const config = getTypeConfig(sa.activities?.type)
                                             return (
-                                                <tr key={sa.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                    <td className="px-5 py-3">
-                                                        <p className="font-medium text-gray-800">{sa.students?.profiles?.full_name}</p>
-                                                        <p className="text-xs text-gray-400">Roll: {sa.students?.roll_number || 'N/A'}</p>
+                                                <tr key={sa.id} className="hover:bg-white/40 transition-colors">
+                                                    <td className="px-5 py-4">
+                                                        <p className="font-semibold text-zinc-800">{sa.students?.profiles?.full_name}</p>
+                                                        <p className="text-xs text-zinc-500">Roll: {sa.students?.roll_number || 'N/A'}</p>
                                                     </td>
-                                                    <td className="px-5 py-3 font-medium text-gray-700">{sa.activities?.name}</td>
-                                                    <td className="px-5 py-3">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${config.color}`}>
+                                                    <td className="px-5 py-4 font-bold text-zinc-700 tracking-tight">{sa.activities?.name}</td>
+                                                    <td className="px-5 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize border ${config.color}`}>
                                                             {sa.activities?.type}
                                                         </span>
                                                     </td>
-                                                    <td className="px-5 py-3 text-gray-500">{sa.role || 'Participant'}</td>
-                                                    <td className="px-5 py-3">
+                                                    <td className="px-5 py-4 text-zinc-600 font-medium">{sa.role || 'Participant'}</td>
+                                                    <td className="px-5 py-4">
                                                         {sa.achievement ? (
-                                                            <span className="text-yellow-600 font-medium">🏅 {sa.achievement}</span>
+                                                            <span className="text-yellow-600 font-semibold flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg w-fit border border-yellow-200"><Medal className="w-4 h-4" /> {sa.achievement}</span>
                                                         ) : (
-                                                            <span className="text-gray-400">—</span>
+                                                            <span className="text-zinc-400">—</span>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -294,29 +307,34 @@ export default function Activities() {
 
             {/* New Activity Modal */}
             {showActivityModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md">
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-bold text-gray-800">Create Activity</h2>
-                            <button onClick={() => setShowActivityModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+                <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white/90 backdrop-blur-xl border border-white rounded-3xl shadow-2xl w-full max-w-md">
+                        <div className="flex items-center justify-between p-6 border-b border-zinc-200/50">
+                            <h2 className="text-xl font-bold text-zinc-800 tracking-tight flex items-center gap-2">
+                                <Trophy className="w-5 h-5 text-violet-600" />
+                                Create Activity
+                            </h2>
+                            <button onClick={() => setShowActivityModal(false)} className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition">
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Activity Name *</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Activity Name *</label>
                                 <input
                                     type="text"
                                     value={activityForm.name}
                                     onChange={e => setActivityForm({ ...activityForm, name: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                     placeholder="Annual Sports Day"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Type *</label>
                                 <select
                                     value={activityForm.type}
                                     onChange={e => setActivityForm({ ...activityForm, type: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select type...</option>
                                     <option value="sports">Sports</option>
@@ -329,32 +347,32 @@ export default function Activities() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Date</label>
                                 <input
                                     type="date"
                                     value={activityForm.date}
                                     onChange={e => setActivityForm({ ...activityForm, date: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Description</label>
                                 <textarea
                                     value={activityForm.description}
                                     onChange={e => setActivityForm({ ...activityForm, description: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                     rows={3}
                                     placeholder="Brief description..."
                                 />
                             </div>
                         </div>
-                        <div className="flex gap-3 p-6 border-t border-gray-100">
+                        <div className="flex gap-3 p-6 border-t border-zinc-200/50 bg-zinc-50/50 rounded-b-3xl">
                             <button onClick={() => setShowActivityModal(false)}
-                                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition text-sm">
+                                className="flex-1 px-4 py-2.5 rounded-xl text-zinc-600 font-medium hover:bg-white transition text-sm border border-transparent hover:border-zinc-200">
                                 Cancel
                             </button>
                             <button onClick={handleAddActivity} disabled={saving}
-                                className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl font-medium transition text-sm">
+                                className="flex-1 btn-primary py-2.5">
                                 {saving ? 'Creating...' : 'Create Activity'}
                             </button>
                         </div>
@@ -364,19 +382,24 @@ export default function Activities() {
 
             {/* Enroll Student Modal */}
             {showEnrollModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md">
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-bold text-gray-800">Enroll Student</h2>
-                            <button onClick={() => setShowEnrollModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+                <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white/90 backdrop-blur-xl border border-white rounded-3xl shadow-2xl w-full max-w-md">
+                        <div className="flex items-center justify-between p-6 border-b border-zinc-200/50">
+                            <h2 className="text-xl font-bold text-zinc-800 tracking-tight flex items-center gap-2">
+                                <UserPlus className="w-5 h-5 text-violet-600" />
+                                Enroll Student
+                            </h2>
+                            <button onClick={() => setShowEnrollModal(false)} className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition">
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Activity *</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Activity *</label>
                                 <select
                                     value={enrollForm.activity_id}
                                     onChange={e => setEnrollForm({ ...enrollForm, activity_id: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select activity...</option>
                                     {activities.map(a => (
@@ -385,11 +408,11 @@ export default function Activities() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Student *</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Student *</label>
                                 <select
                                     value={enrollForm.student_id}
                                     onChange={e => setEnrollForm({ ...enrollForm, student_id: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select student...</option>
                                     {students.map(s => (
@@ -398,33 +421,33 @@ export default function Activities() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Role</label>
                                 <input
                                     type="text"
                                     value={enrollForm.role}
                                     onChange={e => setEnrollForm({ ...enrollForm, role: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                     placeholder="Captain / Participant / Lead..."
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Achievement</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Achievement</label>
                                 <input
                                     type="text"
                                     value={enrollForm.achievement}
                                     onChange={e => setEnrollForm({ ...enrollForm, achievement: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                     placeholder="1st Place / Best Actor / Gold Medal..."
                                 />
                             </div>
                         </div>
-                        <div className="flex gap-3 p-6 border-t border-gray-100">
+                        <div className="flex gap-3 p-6 border-t border-zinc-200/50 bg-zinc-50/50 rounded-b-3xl">
                             <button onClick={() => setShowEnrollModal(false)}
-                                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition text-sm">
+                                className="flex-1 px-4 py-2.5 rounded-xl text-zinc-600 font-medium hover:bg-white transition text-sm border border-transparent hover:border-zinc-200">
                                 Cancel
                             </button>
                             <button onClick={handleEnrollStudent} disabled={saving}
-                                className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl font-medium transition text-sm">
+                                className="flex-1 btn-primary py-2.5">
                                 {saving ? 'Enrolling...' : 'Enroll Student'}
                             </button>
                         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import { supabase } from '../../supabase'
 import toast from 'react-hot-toast'
+import { ClipboardSignature, Plus, Printer, BookOpen, X, Award } from 'lucide-react'
 
 export default function Grades() {
     const [classes, setClasses] = useState([])
@@ -81,11 +82,11 @@ export default function Grades() {
     }
 
     const getGradeColor = (grade) => {
-        if (grade === 'A+' || grade === 'A') return 'bg-green-100 text-green-700'
-        if (grade === 'B+' || grade === 'B') return 'bg-blue-100 text-blue-700'
-        if (grade === 'C') return 'bg-yellow-100 text-yellow-700'
-        if (grade === 'D') return 'bg-orange-100 text-orange-700'
-        return 'bg-red-100 text-red-700'
+        if (grade === 'A+' || grade === 'A') return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        if (grade === 'B+' || grade === 'B') return 'bg-sky-50 text-sky-700 border-sky-200'
+        if (grade === 'C') return 'bg-yellow-50 text-yellow-700 border-yellow-200'
+        if (grade === 'D') return 'bg-orange-50 text-orange-700 border-orange-200'
+        return 'bg-rose-50 text-rose-700 border-rose-200'
     }
 
     const handleSubmit = async () => {
@@ -134,31 +135,32 @@ export default function Grades() {
 
     return (
         <Layout>
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 print:hidden">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Grades</h1>
-                        <p className="text-gray-400 text-sm mt-1">Manage student grades and report cards</p>
+                        <h1 className="text-3xl font-bold text-zinc-800 tracking-tight">Grades</h1>
+                        <p className="text-zinc-500 mt-1">Manage student grades and report cards</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition flex items-center gap-2"
+                        className="btn-primary"
                     >
-                        <span>➕</span> Add Grade
+                        <Award className="w-5 h-5" />
+                        <span>Add Grade</span>
                     </button>
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6 print:hidden">
+                <div className="glass-panel p-5 print:hidden">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Class</label>
+                            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Select Class</label>
                             <select
                                 value={selectedClass}
                                 onChange={e => { setSelectedClass(e.target.value); setSelectedStudent('') }}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                className="input-glass"
                             >
                                 <option value="">Choose a class...</option>
                                 {classes.map(c => (
@@ -167,12 +169,12 @@ export default function Grades() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Student</label>
+                            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Select Student</label>
                             <select
                                 value={selectedStudent}
                                 onChange={e => setSelectedStudent(e.target.value)}
                                 disabled={!selectedClass}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-50"
+                                className="input-glass disabled:opacity-50"
                             >
                                 <option value="">Choose a student...</option>
                                 {students.map(s => (
@@ -186,100 +188,100 @@ export default function Grades() {
                 {selectedStudent && (
                     <>
                         {/* Print Header */}
-                        <div className="hidden print:block text-center mb-8 border-b-2 border-gray-800 pb-6 mt-4">
-                            <h1 className="text-4xl font-bold text-gray-900 mb-2">School Report Card</h1>
-                            <p className="text-xl text-gray-600">Academic Year: {grades[0]?.academic_year || '2025-2026'}</p>
+                        <div className="hidden print:block text-center mb-8 border-b-2 border-zinc-800 pb-6 mt-4">
+                            <h1 className="text-4xl font-bold text-zinc-900 mb-2">School Report Card</h1>
+                            <p className="text-xl text-zinc-600">Academic Year: {grades[0]?.academic_year || '2025-2026'}</p>
                         </div>
 
                         {/* Student Summary Card */}
-                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6 print:shadow-none print:border-2 print:border-gray-200 print:mb-8">
+                        <div className="glass-panel p-6 print:shadow-none print:border-2 print:border-zinc-200 print:mb-8 print:bg-white">
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-blue-600">
+                                    <div className="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center text-xl font-bold text-violet-600 shadow-inner shrink-0">
                                         {selectedStudentData?.profiles?.full_name?.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-gray-800">{selectedStudentData?.profiles?.full_name}</p>
-                                        <p className="text-sm text-gray-400">Roll: {selectedStudentData?.roll_number || 'N/A'}</p>
+                                        <p className="font-bold text-lg text-zinc-800 tracking-tight">{selectedStudentData?.profiles?.full_name}</p>
+                                        <p className="text-sm text-zinc-500">Roll: {selectedStudentData?.roll_number || 'N/A'}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-6 text-center">
-                                    <div className="flex gap-6">
-                                        <div>
-                                            <p className="text-2xl font-bold text-gray-800">{grades.length}</p>
-                                            <p className="text-xs text-gray-400">Exams</p>
+                                    <div className="flex gap-6 divide-x divide-white/50 print:divide-zinc-200">
+                                        <div className="pr-6">
+                                            <p className="text-3xl font-bold text-zinc-800 tracking-tight">{grades.length}</p>
+                                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-1">Exams</p>
                                         </div>
-                                        <div>
-                                            <p className="text-2xl font-bold text-gray-800">{overallPercent}%</p>
-                                            <p className="text-xs text-gray-400">Overall</p>
+                                        <div className="pl-6 pr-6">
+                                            <p className="text-3xl font-bold text-zinc-800 tracking-tight">{overallPercent}%</p>
+                                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-1">Overall</p>
                                         </div>
-                                        <div>
-                                            <span className={`text-2xl font-bold px-3 py-1 rounded-xl ${getGradeColor(overallGrade)} print:border print:border-gray-300`}>
+                                        <div className="pl-6">
+                                            <span className={`text-2xl font-bold px-3 py-1 rounded-xl border ${getGradeColor(overallGrade)} print:border print:border-zinc-300`}>
                                                 {overallGrade}
                                             </span>
-                                            <p className="text-xs text-gray-400 mt-1">Grade</p>
+                                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-2">Grade</p>
                                         </div>
                                     </div>
                                     {/* Print Button */}
                                     <button
                                         onClick={() => window.print()}
-                                        className="print:hidden ml-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition flex items-center gap-2 text-sm border border-gray-200 shadow-sm"
+                                        className="print:hidden ml-4 btn-glass px-4 py-2"
                                     >
-                                        🖨️ Print
+                                        <Printer className="w-4 h-4" /> Print
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Grades Table */}
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden print:shadow-none print:border-2 print:border-gray-200">
-                            <div className="p-5 border-b border-gray-100 print:bg-gray-50">
-                                <h2 className="font-semibold text-gray-800">Grade Records</h2>
+                        <div className="glass-panel overflow-hidden print:shadow-none print:border-2 print:border-zinc-200 print:bg-white">
+                            <div className="p-5 border-b border-white/50 bg-white/30 backdrop-blur-sm print:bg-zinc-50">
+                                <h2 className="font-bold text-zinc-800 tracking-tight">Grade Records</h2>
                             </div>
                             {loading ? (
                                 <div className="flex items-center justify-center py-16">
-                                    <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             ) : grades.length === 0 ? (
                                 <div className="text-center py-16">
-                                    <p className="text-4xl mb-3">📝</p>
-                                    <p className="text-gray-500">No grades recorded yet</p>
-                                    <p className="text-gray-400 text-sm mt-1">Click "Add Grade" to get started</p>
+                                    <BookOpen className="w-16 h-16 mx-auto text-zinc-300 mb-4" />
+                                    <p className="text-zinc-500 font-medium">No grades recorded yet</p>
+                                    <p className="text-zinc-400 text-sm mt-1">Click "Add Grade" to get started</p>
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
+                                <div className="overflow-x-auto custom-scrollbar">
                                     <table className="w-full text-sm">
-                                        <thead className="bg-gray-50">
+                                        <thead className="bg-white/40 border-b border-white print:bg-zinc-100">
                                             <tr>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Subject</th>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Exam Type</th>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Marks</th>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Percentage</th>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Grade</th>
-                                                <th className="text-left px-5 py-3 text-gray-500 font-medium">Year</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Subject</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Exam Type</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Marks</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Percentage</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Grade</th>
+                                                <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Year</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            {grades.map((grade, i) => {
+                                        <tbody className="divide-y divide-white/50 print:divide-zinc-200">
+                                            {grades.map((grade) => {
                                                 const percent = ((grade.marks_obtained / grade.total_marks) * 100).toFixed(1)
                                                 return (
-                                                    <tr key={grade.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                        <td className="px-5 py-3 text-gray-800 font-medium">
+                                                    <tr key={grade.id} className="hover:bg-white/40 transition-colors print:hover:bg-transparent">
+                                                        <td className="px-5 py-4 text-zinc-800 font-medium">
                                                             {grade.subjects?.name || 'General'}
                                                         </td>
-                                                        <td className="px-5 py-3 text-gray-500 capitalize">
+                                                        <td className="px-5 py-4 text-zinc-500 capitalize">
                                                             {grade.exam_type?.replace('_', ' ')}
                                                         </td>
-                                                        <td className="px-5 py-3 text-gray-800">
+                                                        <td className="px-5 py-4 text-zinc-800 font-medium">
                                                             {grade.marks_obtained}/{grade.total_marks}
                                                         </td>
-                                                        <td className="px-5 py-3 text-gray-600">{percent}%</td>
-                                                        <td className="px-5 py-3">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getGradeColor(grade.grade)}`}>
+                                                        <td className="px-5 py-4 text-zinc-600">{percent}%</td>
+                                                        <td className="px-5 py-4">
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getGradeColor(grade.grade)}`}>
                                                                 {grade.grade}
                                                             </span>
                                                         </td>
-                                                        <td className="px-5 py-3 text-gray-400">{grade.academic_year}</td>
+                                                        <td className="px-5 py-4 text-zinc-400">{grade.academic_year}</td>
                                                     </tr>
                                                 )
                                             })}
@@ -292,32 +294,33 @@ export default function Grades() {
                 )}
 
                 {!selectedStudent && (
-                    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 print:hidden">
-                        <p className="text-4xl mb-3">📝</p>
-                        <p className="text-gray-500 font-medium">Select a class and student to view grades</p>
+                    <div className="text-center py-16 glass-panel print:hidden">
+                        <ClipboardSignature className="w-16 h-16 mx-auto text-violet-200 mb-4" />
+                        <p className="text-zinc-500 font-medium">Select a class and student to view grades</p>
                     </div>
                 )}
             </div>
 
             {/* Add Grade Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md">
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-bold text-gray-800">Add Grade</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+                <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white/90 backdrop-blur-xl border border-white rounded-3xl shadow-2xl w-full max-w-md">
+                        <div className="flex items-center justify-between p-6 border-b border-zinc-200/50">
+                            <h2 className="text-xl font-bold text-zinc-800 tracking-tight">Add Grade</h2>
+                            <button onClick={() => setShowModal(false)} className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition">
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
-                        <div className="p-6 space-y-4">
-
+                        <div className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Class</label>
                                 <select
                                     value={form.class_id}
                                     onChange={e => {
                                         setForm({ ...form, class_id: e.target.value, student_id: '' })
                                         setSelectedClass(e.target.value)
                                     }}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select class...</option>
                                     {classes.map(c => (
@@ -327,11 +330,11 @@ export default function Grades() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Student *</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Student *</label>
                                 <select
                                     value={form.student_id}
                                     onChange={e => setForm({ ...form, student_id: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select student...</option>
                                     {students.map(s => (
@@ -341,11 +344,11 @@ export default function Grades() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Subject</label>
                                 <select
                                     value={form.subject_id}
                                     onChange={e => setForm({ ...form, subject_id: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="">Select subject (optional)...</option>
                                     {subjects.map(s => (
@@ -355,11 +358,11 @@ export default function Grades() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Exam Type</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Exam Type</label>
                                 <select
                                     value={form.exam_type}
                                     onChange={e => setForm({ ...form, exam_type: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                 >
                                     <option value="unit_test">Unit Test</option>
                                     <option value="midterm">Midterm</option>
@@ -370,43 +373,43 @@ export default function Grades() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Marks Obtained *</label>
+                                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">Marks Obtained *</label>
                                     <input
                                         type="number"
                                         value={form.marks_obtained}
                                         onChange={e => setForm({ ...form, marks_obtained: e.target.value })}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className="input-glass"
                                         placeholder="85"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Total Marks *</label>
+                                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">Total Marks *</label>
                                     <input
                                         type="number"
                                         value={form.total_marks}
                                         onChange={e => setForm({ ...form, total_marks: e.target.value })}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className="input-glass"
                                         placeholder="100"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1.5">Academic Year</label>
                                 <input
                                     type="text"
                                     value={form.academic_year}
                                     onChange={e => setForm({ ...form, academic_year: e.target.value })}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="input-glass"
                                     placeholder="2025-2026"
                                 />
                             </div>
 
                             {form.marks_obtained && form.total_marks && (
-                                <div className="bg-blue-50 rounded-xl p-3 text-center">
-                                    <span className="text-sm text-blue-600 font-medium">
+                                <div className="bg-violet-50/50 rounded-xl p-3 text-center border border-violet-100">
+                                    <span className="text-sm text-violet-700 font-medium">
                                         Grade Preview: {' '}
-                                        <span className={`px-2 py-0.5 rounded-lg text-sm font-bold ${getGradeColor(getGradeLetter(Number(form.marks_obtained), Number(form.total_marks)))}`}>
+                                        <span className={`px-2 py-0.5 rounded-lg text-sm font-bold border ${getGradeColor(getGradeLetter(Number(form.marks_obtained), Number(form.total_marks)))}`}>
                                             {getGradeLetter(Number(form.marks_obtained), Number(form.total_marks))}
                                         </span>
                                         {' '} ({((form.marks_obtained / form.total_marks) * 100).toFixed(1)}%)
@@ -415,13 +418,13 @@ export default function Grades() {
                             )}
                         </div>
 
-                        <div className="flex gap-3 p-6 border-t border-gray-100">
+                        <div className="flex gap-3 p-6 border-t border-zinc-200/50 bg-zinc-50/50 rounded-b-3xl">
                             <button onClick={() => setShowModal(false)}
-                                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition text-sm">
+                                className="flex-1 px-4 py-2.5 rounded-xl text-zinc-600 font-medium hover:bg-white transition text-sm border border-transparent hover:border-zinc-200">
                                 Cancel
                             </button>
                             <button onClick={handleSubmit} disabled={saving}
-                                className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl font-medium transition text-sm">
+                                className="flex-1 btn-primary py-2.5">
                                 {saving ? 'Saving...' : 'Save Grade'}
                             </button>
                         </div>

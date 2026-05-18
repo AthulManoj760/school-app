@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import { supabase } from '../../supabase'
 import toast from 'react-hot-toast'
+import { CalendarCheck, History, Save, CheckCircle2, UserX, Clock, Plane, Users, CheckSquare } from 'lucide-react'
 
 export default function Attendance() {
     const [classes, setClasses] = useState([])
@@ -120,10 +121,10 @@ export default function Attendance() {
     }
 
     const statusConfig = {
-        present: { label: 'Present', color: 'bg-green-100 text-green-700 border-green-300', dot: 'bg-green-500' },
-        absent: { label: 'Absent', color: 'bg-red-100 text-red-700 border-red-300', dot: 'bg-red-500' },
-        late: { label: 'Late', color: 'bg-yellow-100 text-yellow-700 border-yellow-300', dot: 'bg-yellow-500' },
-        leave: { label: 'Leave', color: 'bg-blue-100 text-blue-700 border-blue-300', dot: 'bg-blue-500' },
+        present: { label: 'Present', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: CheckCircle2 },
+        absent: { label: 'Absent', color: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-500', icon: UserX },
+        late: { label: 'Late', color: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500', icon: Clock },
+        leave: { label: 'Leave', color: 'bg-sky-50 text-sky-700 border-sky-200', dot: 'bg-sky-500', icon: Plane },
     }
 
     const summary = {
@@ -135,26 +136,26 @@ export default function Attendance() {
 
     return (
         <Layout>
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Attendance</h1>
-                        <p className="text-gray-400 text-sm mt-1">Mark and track student attendance</p>
+                        <h1 className="text-3xl font-bold text-zinc-800 tracking-tight">Attendance</h1>
+                        <p className="text-zinc-500 mt-1">Mark and track student attendance</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 glass-panel p-1 border-white/50">
                         <button
                             onClick={() => { setViewMode('mark') }}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'mark' ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 ${viewMode === 'mark' ? 'bg-violet-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                         >
-                            ✅ Mark
+                            <CheckSquare className="w-4 h-4" /> Mark
                         </button>
                         <button
                             onClick={() => { setViewMode('history'); fetchHistory() }}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'history' ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 ${viewMode === 'history' ? 'bg-violet-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                         >
-                            📋 History
+                            <History className="w-4 h-4" /> History
                         </button>
                     </div>
                 </div>
@@ -162,14 +163,14 @@ export default function Attendance() {
                 {viewMode === 'mark' && (
                     <>
                         {/* Filters */}
-                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+                        <div className="glass-panel p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Class</label>
+                                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">Select Class</label>
                                     <select
                                         value={selectedClass}
                                         onChange={e => setSelectedClass(e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className="input-glass"
                                     >
                                         <option value="">Choose a class...</option>
                                         {classes.map(c => (
@@ -178,12 +179,12 @@ export default function Attendance() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">Date</label>
                                     <input
                                         type="date"
                                         value={selectedDate}
                                         onChange={e => setSelectedDate(e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        className="input-glass"
                                     />
                                 </div>
                             </div>
@@ -192,24 +193,29 @@ export default function Attendance() {
                         {selectedClass && students.length > 0 && (
                             <>
                                 {/* Summary */}
-                                <div className="grid grid-cols-4 gap-3 mb-6">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {Object.entries(summary).map(([status, count]) => (
-                                        <div key={status} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
-                                            <div className={`w-3 h-3 rounded-full ${statusConfig[status].dot} mx-auto mb-2`}></div>
-                                            <p className="text-2xl font-bold text-gray-800">{count}</p>
-                                            <p className="text-xs text-gray-400 capitalize">{status}</p>
+                                        <div key={status} className="glass-panel p-4 text-center hover:-translate-y-1 transition-transform">
+                                            <div className={`w-10 h-10 rounded-xl mx-auto flex items-center justify-center mb-3 shadow-inner ${statusConfig[status].color}`}>
+                                                {status === 'present' && <CheckCircle2 className="w-5 h-5" />}
+                                                {status === 'absent' && <UserX className="w-5 h-5" />}
+                                                {status === 'late' && <Clock className="w-5 h-5" />}
+                                                {status === 'leave' && <Plane className="w-5 h-5" />}
+                                            </div>
+                                            <p className="text-3xl font-bold text-zinc-800 tracking-tight">{count}</p>
+                                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-1">{status}</p>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* Mark All Buttons */}
-                                <div className="flex gap-2 mb-4 flex-wrap">
-                                    <span className="text-sm text-gray-500 self-center">Mark all:</span>
+                                <div className="flex gap-2 flex-wrap items-center bg-white/40 p-2 rounded-2xl border border-white">
+                                    <span className="text-sm font-medium text-zinc-500 px-2">Mark all:</span>
                                     {Object.keys(statusConfig).map(status => (
                                         <button
                                             key={status}
                                             onClick={() => markAll(status)}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${statusConfig[status].color}`}
+                                            className={`px-4 py-2 rounded-xl text-xs font-medium border transition-colors shadow-sm ${statusConfig[status].color} hover:brightness-95`}
                                         >
                                             {statusConfig[status].label}
                                         </button>
@@ -217,41 +223,48 @@ export default function Attendance() {
                                 </div>
 
                                 {/* Student List */}
-                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+                                <div className="glass-panel overflow-hidden">
                                     {loading ? (
                                         <div className="flex items-center justify-center py-16">
-                                            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
                                         </div>
                                     ) : (
-                                        students.map((student, index) => (
-                                            <div key={student.id} className={`flex items-center justify-between p-4 ${index !== students.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
-                                                        {student.profiles?.full_name?.charAt(0)}
+                                        <div className="divide-y divide-white/50">
+                                            {students.map((student) => (
+                                                <div key={student.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 hover:bg-white/40 transition-colors">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center font-bold text-violet-600 shrink-0">
+                                                            {student.profiles?.full_name?.charAt(0)}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-semibold text-zinc-800 text-sm">{student.profiles?.full_name}</p>
+                                                            <p className="text-xs text-zinc-500">Roll: {student.roll_number || 'N/A'}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="font-medium text-gray-800 text-sm">{student.profiles?.full_name}</p>
-                                                        <p className="text-xs text-gray-400">Roll: {student.roll_number || 'N/A'}</p>
-                                                    </div>
-                                                </div>
 
-                                                {/* Status Buttons */}
-                                                <div className="flex gap-2">
-                                                    {Object.keys(statusConfig).map(status => (
-                                                        <button
-                                                            key={status}
-                                                            onClick={() => handleStatusChange(student.id, status)}
-                                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${attendance[student.id] === status
-                                                                    ? statusConfig[status].color
-                                                                    : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
-                                                                }`}
-                                                        >
-                                                            {statusConfig[status].label}
-                                                        </button>
-                                                    ))}
+                                                    {/* Status Buttons */}
+                                                    <div className="flex flex-wrap sm:flex-nowrap gap-2">
+                                                        {Object.keys(statusConfig).map(status => {
+                                                            const isSelected = attendance[student.id] === status;
+                                                            const Icon = statusConfig[status].icon;
+                                                            return (
+                                                                <button
+                                                                    key={status}
+                                                                    onClick={() => handleStatusChange(student.id, status)}
+                                                                    className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all flex items-center gap-1.5 ${isSelected
+                                                                            ? `${statusConfig[status].color} shadow-sm ring-1 ring-inset ${statusConfig[status].color.split(' ')[2]}`
+                                                                            : 'bg-white/50 text-zinc-500 border-white hover:bg-white/80'
+                                                                        }`}
+                                                                >
+                                                                    <Icon className="w-3.5 h-3.5" />
+                                                                    <span className={!isSelected ? 'hidden sm:inline' : 'inline'}>{statusConfig[status].label}</span>
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
 
@@ -259,61 +272,63 @@ export default function Attendance() {
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition"
+                                    className="btn-primary w-full py-4 text-base"
                                 >
-                                    {saving ? 'Saving...' : '💾 Save Attendance'}
+                                    <Save className="w-5 h-5" />
+                                    {saving ? 'Saving...' : 'Save Attendance'}
                                 </button>
                             </>
                         )}
 
                         {selectedClass && students.length === 0 && !loading && (
-                            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-                                <p className="text-4xl mb-3">👨‍🎓</p>
-                                <p className="text-gray-500">No students found in this class</p>
+                            <div className="text-center py-16 glass-panel">
+                                <Users className="w-16 h-16 mx-auto text-zinc-300 mb-4" />
+                                <p className="text-zinc-500 font-medium">No students found in this class</p>
                             </div>
                         )}
 
                         {!selectedClass && (
-                            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-                                <p className="text-4xl mb-3">✅</p>
-                                <p className="text-gray-500 font-medium">Select a class to mark attendance</p>
+                            <div className="text-center py-16 glass-panel">
+                                <CalendarCheck className="w-16 h-16 mx-auto text-violet-200 mb-4" />
+                                <p className="text-zinc-500 font-medium">Select a class to mark attendance</p>
                             </div>
                         )}
                     </>
                 )}
 
                 {viewMode === 'history' && (
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-5 border-b border-gray-100">
-                            <h2 className="font-semibold text-gray-800">Recent Attendance Records</h2>
+                    <div className="glass-panel overflow-hidden">
+                        <div className="p-5 border-b border-white/50 bg-white/30 backdrop-blur-sm">
+                            <h2 className="font-bold text-zinc-800 tracking-tight">Recent Attendance Records</h2>
                         </div>
                         {history.length === 0 ? (
                             <div className="text-center py-16">
-                                <p className="text-gray-400">No attendance records yet</p>
+                                <History className="w-16 h-16 mx-auto text-zinc-300 mb-4" />
+                                <p className="text-zinc-400">No attendance records yet</p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto custom-scrollbar">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-gray-50">
+                                    <thead className="bg-white/40 border-b border-white">
                                         <tr>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Student</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Class</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Date</th>
-                                            <th className="text-left px-5 py-3 text-gray-500 font-medium">Status</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Student</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Class</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Date</th>
+                                            <th className="text-left px-5 py-4 text-zinc-600 font-semibold tracking-wide">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {history.map((record, i) => (
-                                            <tr key={record.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                <td className="px-5 py-3 text-gray-800">
+                                    <tbody className="divide-y divide-white/50">
+                                        {history.map((record) => (
+                                            <tr key={record.id} className="hover:bg-white/40 transition-colors">
+                                                <td className="px-5 py-4 text-zinc-800 font-medium">
                                                     {record.students?.profiles?.full_name || 'Unknown'}
                                                 </td>
-                                                <td className="px-5 py-3 text-gray-500">
+                                                <td className="px-5 py-4 text-zinc-500">
                                                     {record.classes?.name} {record.classes?.section}
                                                 </td>
-                                                <td className="px-5 py-3 text-gray-500">{record.date}</td>
-                                                <td className="px-5 py-3">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${statusConfig[record.status]?.color}`}>
+                                                <td className="px-5 py-4 text-zinc-500">{record.date}</td>
+                                                <td className="px-5 py-4">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusConfig[record.status]?.color}`}>
                                                         {record.status}
                                                     </span>
                                                 </td>

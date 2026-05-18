@@ -11,7 +11,33 @@ export default function Students() {
     const [search, setSearch] = useState('')
     const [filterClass, setFilterClass] = useState('')
     const [showModal, setShowModal] = useState(false)
+    const [editingStudent, setEditingStudent] = useState(null)
     const navigate = useNavigate()
+
+    const handleDelete = async (e, student) => {
+        e.stopPropagation()
+        const confirmed = window.confirm(`Delete ${student.profiles?.full_name}? This cannot be undone.`)
+        if (!confirmed) return
+        
+        try {
+            const { error: studentError } = await supabase
+                .from('students')
+                .delete()
+                .eq('id', student.id)
+            if (studentError) throw studentError
+
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('id', student.profile_id)
+            if (profileError) throw profileError
+
+            toast.success('Student deleted')
+            fetchStudents()
+        } catch (err) {
+            toast.error(err.message)
+        }
+    }
 
     useEffect(() => {
         fetchStudents()
@@ -57,7 +83,10 @@ export default function Students() {
                         <p className="text-gray-400 text-sm mt-1">{students.length} total students</p>
                     </div>
                     <button
-                        onClick={() => setShowModal(true)}
+                        onClick={() => {
+                            setEditingStudent(null)
+                            setShowModal(true)
+                        }}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition flex items-center gap-2"
                     >
                         <span>➕</span> Add Student
@@ -127,16 +156,35 @@ export default function Students() {
                                     <span>🏫 {student.classes?.name} {student.classes?.section || ''}</span>
                                     <span>📞 {student.profiles?.phone || 'N/A'}</span>
                                 </div>
+                                <div className="flex gap-2 mt-4 pt-3 border-t border-gray-50">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setEditingStudent(student)
+                                            setShowModal(true)
+                                        }}
+                                        className="flex-1 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-medium hover:bg-blue-100 transition"
+                                    >
+                                        ✏️ Edit
+                                    </button>
+                                    <button
+                                        onClick={(e) => handleDelete(e, student)}
+                                        className="flex-1 py-2 bg-red-50 text-red-400 rounded-xl text-xs font-medium hover:bg-red-100 transition"
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* Add Student Modal */}
+            {/* Add/Edit Student Modal */}
             {showModal && (
-                <AddStudentModal
+                <StudentModal
                     classes={classes}
+                    editingStudent={editingStudent}
                     onClose={() => setShowModal(false)}
                     onSuccess={() => {
                         setShowModal(false)
@@ -148,22 +196,22 @@ export default function Students() {
     )
 }
 
-function AddStudentModal({ classes, onClose, onSuccess }) {
+function StudentModal({ classes, editingStudent, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
-        full_name: '',
-        phone: '',
+        full_name: editingStudent?.profiles?.full_name || '',
+        phone: editingStudent?.profiles?.phone || '',
         email: '',
         password: '',
-        roll_number: '',
-        class_id: '',
-        date_of_birth: '',
-        gender: '',
-        blood_group: '',
-        address: '',
-        medical_notes: '',
-        emergency_contact: '',
-        emergency_phone: '',
+        roll_number: editingStudent?.roll_number || '',
+        class_id: editingStudent?.class_id || '',
+        date_of_birth: editingStudent?.date_of_birth || '',
+        gender: editingStudent?.gender || '',
+        blood_group: editingStudent?.blood_group || '',
+        address: editingStudent?.address || '',
+        medical_notes: editingStudent?.medical_notes || '',
+        emergency_contact: editingStudent?.emergency_contact || '',
+        emergency_phone: editingStudent?.emergency_phone || '',
     })
 
     const handleChange = e => {
@@ -177,37 +225,68 @@ function AddStudentModal({ classes, onClose, onSuccess }) {
         }
         setLoading(true)
         try {
-            // 1. Insert directly into profiles table
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .insert({
-                    id: crypto.randomUUID(),
-                    full_name: form.full_name,
-                    phone: form.phone,
-                    role: 'student',
+            if (editingStudent) {
+                // Update profile
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .update({
+                        full_name: form.full_name,
+                        phone: form.phone,
+                    })
+                    .eq('id', editingStudent.profile_id)
+                if (profileError) throw profileError
+
+                // Update student record
+                const { error: studentError } = await supabase
+                    .from('students')
+                    .update({
+                        class_id: form.class_id || null,
+                        roll_number: form.roll_number,
+                        date_of_birth: form.date_of_birth || null,
+                        gender: form.gender,
+                        blood_group: form.blood_group,
+                        address: form.address,
+                        medical_notes: form.medical_notes,
+                        emergency_contact: form.emergency_contact,
+                        emergency_phone: form.emergency_phone,
+                    })
+                    .eq('id', editingStudent.id)
+                if (studentError) throw studentError
+
+                toast.success('Student updated successfully!')
+            } else {
+                // 1. Insert directly into profiles table
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: crypto.randomUUID(),
+                        full_name: form.full_name,
+                        phone: form.phone,
+                        role: 'student',
+                    })
+                    .select()
+                    .single()
+
+                if (profileError) throw profileError
+
+                // 2. Create student record
+                const { error: studentError } = await supabase.from('students').insert({
+                    profile_id: profileData.id,
+                    class_id: form.class_id || null,
+                    roll_number: form.roll_number,
+                    date_of_birth: form.date_of_birth || null,
+                    gender: form.gender,
+                    blood_group: form.blood_group,
+                    address: form.address,
+                    medical_notes: form.medical_notes,
+                    emergency_contact: form.emergency_contact,
+                    emergency_phone: form.emergency_phone,
+                    status: 'active',
                 })
-                .select()
-                .single()
+                if (studentError) throw studentError
 
-            if (profileError) throw profileError
-
-            // 2. Create student record
-            const { error: studentError } = await supabase.from('students').insert({
-                profile_id: profileData.id,
-                class_id: form.class_id || null,
-                roll_number: form.roll_number,
-                date_of_birth: form.date_of_birth || null,
-                gender: form.gender,
-                blood_group: form.blood_group,
-                address: form.address,
-                medical_notes: form.medical_notes,
-                emergency_contact: form.emergency_contact,
-                emergency_phone: form.emergency_phone,
-                status: 'active',
-            })
-            if (studentError) throw studentError
-
-            toast.success('Student added successfully!')
+                toast.success('Student added successfully!')
+            }
             onSuccess()
         } catch (err) {
             toast.error(err.message || 'Something went wrong')
@@ -221,7 +300,9 @@ function AddStudentModal({ classes, onClose, onSuccess }) {
 
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-800">Add New Student</h2>
+                    <h2 className="text-xl font-bold text-gray-800">
+                        {editingStudent ? 'Edit Student' : 'Add New Student'}
+                    </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
                 </div>
 
@@ -243,18 +324,22 @@ function AddStudentModal({ classes, onClose, onSuccess }) {
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 placeholder="+91 9876543210" />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                            <input name="email" type="email" value={form.email} onChange={handleChange}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                placeholder="student@school.com" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                            <input name="password" type="password" value={form.password} onChange={handleChange}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                placeholder="Min 6 characters" />
-                        </div>
+                        {!editingStudent && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                    <input name="email" type="email" value={form.email} onChange={handleChange}
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        placeholder="student@school.com" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                                    <input name="password" type="password" value={form.password} onChange={handleChange}
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                        placeholder="Min 6 characters" />
+                                </div>
+                            </>
+                        )}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                             <input name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange}
@@ -339,7 +424,7 @@ function AddStudentModal({ classes, onClose, onSuccess }) {
                     </button>
                     <button onClick={handleSubmit} disabled={loading}
                         className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl font-medium transition text-sm">
-                        {loading ? 'Adding...' : 'Add Student'}
+                        {loading ? 'Saving...' : editingStudent ? 'Update Student' : 'Add Student'}
                     </button>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import StudentProfile from './pages/students/StudentProfile'
 import Attendance from './pages/attendance/Attendance'
 import Grades from './pages/grades/Grades'
 import Fees from './pages/fees/Fees'
+import Activities from './pages/activities/Activities'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -33,7 +34,7 @@ export default function App() {
           <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
           <Route path="/grades" element={<ProtectedRoute><Grades /></ProtectedRoute>} />
           <Route path="/fees" element={<ProtectedRoute><Fees /></ProtectedRoute>} />
-          <Route path="/activities" element={<ProtectedRoute><div className="p-8">Activities Coming Soon</div></ProtectedRoute>} />
+          <Route path="/activities" element={<ProtectedRoute><Activities /></ProtectedRoute>} />
           <Route path="/timetable" element={<ProtectedRoute><div className="p-8">Timetable Coming Soon</div></ProtectedRoute>} />
           <Route path="/communication" element={<ProtectedRoute><div className="p-8">Communication Coming Soon</div></ProtectedRoute>} />
           <Route path="/students/:id" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />

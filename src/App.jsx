@@ -13,9 +13,11 @@ import Timetable from './pages/timetable/Timetable'
 import Communication from './pages/communication/Communication'
 import Classes from './pages/classes/Classes'
 import Teachers from './pages/teachers/Teachers'
+import StudentDashboard from './pages/student/StudentDashboard'
 
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
+function RoleRoute() {
+  const { user, profile, loading } = useAuth()
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
@@ -24,7 +26,32 @@ function ProtectedRoute({ children }) {
       </div>
     </div>
   )
-  return user ? children : <Navigate to="/login" />
+
+  if (!user) return <Navigate to="/login" />
+
+  if (profile?.role === 'student') return <Navigate to="/student-dashboard" />
+  if (profile?.role === 'teacher') return <Navigate to="/teacher-dashboard" />
+  return <Navigate to="/dashboard" />
+}
+
+function ProtectedRoute({ children, allowedRoles }) {
+  const { user, profile, loading } = useAuth()
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+    </div>
+  )
+
+  if (!user) return <Navigate to="/login" />
+
+  if (allowedRoles && !allowedRoles.includes(profile?.role)) {
+    if (profile?.role === 'student') return <Navigate to="/student-dashboard" />
+    if (profile?.role === 'teacher') return <Navigate to="/teacher-dashboard" />
+    return <Navigate to="/dashboard" />
+  }
+
+  return children
 }
 
 export default function App() {
@@ -33,19 +60,30 @@ export default function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
+          {/* Public */}
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
-          <Route path="/grades" element={<ProtectedRoute><Grades /></ProtectedRoute>} />
-          <Route path="/fees" element={<ProtectedRoute><Fees /></ProtectedRoute>} />
-          <Route path="/activities" element={<ProtectedRoute><Activities /></ProtectedRoute>} />
-          <Route path="/timetable" element={<ProtectedRoute><Timetable /></ProtectedRoute>} />
-          <Route path="/communication" element={<ProtectedRoute><Communication /></ProtectedRoute>} />
-          <Route path="/students/:id" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
-          <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-          <Route path="/classes" element={<ProtectedRoute><Classes /></ProtectedRoute>} />
-          <Route path="/teachers" element={<ProtectedRoute><Teachers /></ProtectedRoute>} />
 
+          {/* Role-based redirect */}
+          <Route path="/" element={<RoleRoute />} />
+
+          {/* Admin Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><Dashboard /></ProtectedRoute>} />
+          <Route path="/students" element={<ProtectedRoute allowedRoles={['admin']}><Students /></ProtectedRoute>} />
+          <Route path="/students/:id" element={<ProtectedRoute allowedRoles={['admin']}><StudentProfile /></ProtectedRoute>} />
+          <Route path="/classes" element={<ProtectedRoute allowedRoles={['admin']}><Classes /></ProtectedRoute>} />
+          <Route path="/teachers" element={<ProtectedRoute allowedRoles={['admin']}><Teachers /></ProtectedRoute>} />
+          <Route path="/attendance" element={<ProtectedRoute allowedRoles={['admin']}><Attendance /></ProtectedRoute>} />
+          <Route path="/grades" element={<ProtectedRoute allowedRoles={['admin']}><Grades /></ProtectedRoute>} />
+          <Route path="/fees" element={<ProtectedRoute allowedRoles={['admin']}><Fees /></ProtectedRoute>} />
+          <Route path="/activities" element={<ProtectedRoute allowedRoles={['admin']}><Activities /></ProtectedRoute>} />
+          <Route path="/timetable" element={<ProtectedRoute allowedRoles={['admin']}><Timetable /></ProtectedRoute>} />
+          <Route path="/communication" element={<ProtectedRoute allowedRoles={['admin']}><Communication /></ProtectedRoute>} />
+
+          {/* Student Routes */}
+          <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

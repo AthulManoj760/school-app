@@ -195,8 +195,8 @@ export default function StudentDashboard() {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 rounded-xl text-sm font-medium capitalize whitespace-nowrap transition ${activeTab === tab
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
                                 }`}
                         >
                             {tab}
@@ -348,9 +348,9 @@ export default function StudentDashboard() {
                                                 <td className="px-5 py-3 text-gray-800">{record.date}</td>
                                                 <td className="px-5 py-3">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${record.status === 'present' ? 'bg-green-100 text-green-700' :
-                                                            record.status === 'absent' ? 'bg-red-100 text-red-700' :
-                                                                record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-blue-100 text-blue-700'
+                                                        record.status === 'absent' ? 'bg-red-100 text-red-700' :
+                                                            record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-blue-100 text-blue-700'
                                                         }`}>
                                                         {record.status}
                                                     </span>

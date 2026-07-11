@@ -13,18 +13,22 @@ import Timetable from './pages/timetable/Timetable'
 import Communication from './pages/communication/Communication'
 import Classes from './pages/classes/Classes'
 import Teachers from './pages/teachers/Teachers'
+import StudentDashboard from './pages/student/StudentDashboard'
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
+  const { user, profile, loading } = useAuth()
+
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-500">Loading...</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   )
-  return user ? children : <Navigate to="/login" />
+
+  if (!user) return <Navigate to="/login" />
+  if (profile?.role === 'student') return <Navigate to="/student-dashboard" />
+  if (profile?.role === 'teacher') return <Navigate to="/teacher-dashboard" />
+
+  return children
 }
 
 export default function App() {
@@ -45,6 +49,7 @@ export default function App() {
           <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
           <Route path="/classes" element={<ProtectedRoute><Classes /></ProtectedRoute>} />
           <Route path="/teachers" element={<ProtectedRoute><Teachers /></ProtectedRoute>} />
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
 
         </Routes>
       </BrowserRouter>

@@ -19,44 +19,47 @@ export default function Attendance() {
 
     useEffect(() => {
         if (selectedClass && selectedDate) {
-            fetchStudents()
-            fetchExistingAttendance()
+            fetchStudentsAndAttendance()
         }
     }, [selectedClass, selectedDate])
 
-    const fetchClasses = async () => {
-        const { data } = await supabase.from('classes').select('*')
-        setClasses(data || [])
-    }
-
-    const fetchStudents = async () => {
+    const fetchStudentsAndAttendance = async () => {
         setLoading(true)
         const { data } = await supabase
             .from('students')
             .select('*, profiles(full_name)')
             .eq('class_id', selectedClass)
             .eq('status', 'active')
-        setStudents(data || [])
+        const studentList = data || []
+        setStudents(studentList)
 
         // Default all to present
         const defaults = {}
-        data?.forEach(s => { defaults[s.id] = 'present' })
-        setAttendance(prev => ({ ...defaults, ...prev }))
+        studentList.forEach(s => { defaults[s.id] = 'present' })
+
+        // Fetch existing attendance for this class+date
+        const studentIds = studentList.map(s => s.id)
+        if (studentIds.length > 0) {
+            const { data: attData } = await supabase
+                .from('attendance')
+                .select('*')
+                .in('student_id', studentIds)
+                .eq('date', selectedDate)
+            if (attData && attData.length > 0) {
+                const existing = {}
+                attData.forEach(r => { existing[r.student_id] = r.status })
+                setAttendance(existing)
+            } else {
+                setAttendance(defaults)
+            }
+        } else {
+            setAttendance(defaults)
+        }
         setLoading(false)
     }
-
-    const fetchExistingAttendance = async () => {
-        const { data } = await supabase
-            .from('attendance')
-            .select('*')
-            .eq('class_id', selectedClass)
-            .eq('date', selectedDate)
-
-        if (data && data.length > 0) {
-            const existing = {}
-            data.forEach(r => { existing[r.student_id] = r.status })
-            setAttendance(existing)
-        }
+    const fetchClasses = async () => {
+        const { data } = await supabase.from('classes').select('*')
+        setClasses(data || [])
     }
 
     const fetchHistory = async () => {

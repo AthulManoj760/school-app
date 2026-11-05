@@ -22,6 +22,7 @@ export default function Grades() {
         marks_obtained: '',
         total_marks: '100',
         academic_year: '2025-2026',
+        class_id: '',
     })
 
     useEffect(() => { fetchClasses() }, [])
@@ -118,7 +119,7 @@ export default function Grades() {
             toast.success('Grade added successfully!')
             setShowModal(false)
             if (selectedStudent === form.student_id) fetchGrades()
-            setForm({ ...form, marks_obtained: '', subject_id: '' })
+            setForm({ ...form, marks_obtained: '', subject_id: '', student_id: '', class_id: '' })
         } catch (err) {
             toast.error(err.message)
         }
@@ -315,10 +316,10 @@ export default function Grades() {
                             <div>
                                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Class</label>
                                 <select
-                                    value={form.class_id}
+                                    value={selectedClass}
                                     onChange={e => {
-                                        setForm({ ...form, class_id: e.target.value, student_id: '' })
                                         setSelectedClass(e.target.value)
+                                        setForm({ ...form, student_id: '' })
                                     }}
                                     className="input-glass"
                                 >

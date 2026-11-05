@@ -14,6 +14,7 @@ import Communication from './pages/communication/Communication'
 import Classes from './pages/classes/Classes'
 import Teachers from './pages/teachers/Teachers'
 import StudentDashboard from './pages/student/StudentDashboard'
+import TeacherDashboard from './pages/teacher/TeacherDashboard'
 
 function RoleRoute() {
   const { user, profile, loading } = useAuth()
@@ -81,6 +82,9 @@ export default function App() {
 
           {/* Student Routes */}
           <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+
+          {/* Teacher Routes */}
+          <Route path="/teacher-dashboard" element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -7,20 +7,33 @@ export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const { signIn } = useAuth()
+    const { user, signIn } = useAuth()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user) {
+            navigate('/', { replace: true })
+        }
+    }, [user, navigate])
 
     const handleLogin = async (e) => {
         e.preventDefault()
+        if (loading) return
         setLoading(true)
-        const { error } = await signIn(email, password)
-        if (error) {
-            toast.error(error.message)
-        } else {
-            toast.success('Welcome back!')
-            navigate('/')
+        try {
+            const { error } = await signIn(email.trim(), password)
+            if (error) {
+                toast.error(error.message || 'Invalid login credentials')
+            } else {
+                toast.success('Welcome back!')
+                navigate('/', { replace: true })
+            }
+        } catch (err) {
+            console.error('Login error:', err)
+            toast.error(err.message || 'Login failed')
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     return (

@@ -26,24 +26,30 @@ export default function Classes() {
 
     const fetchClasses = async () => {
         setLoading(true)
-        const { data } = await supabase
-            .from('classes')
-            .select('*')
-            .order('name', { ascending: true })
-        setClasses(data || [])
+        try {
+            const [classesRes, studentsRes] = await Promise.all([
+                supabase.from('classes').select('*').order('name', { ascending: true }),
+                supabase.from('students').select('class_id').eq('status', 'active'),
+            ])
 
-        // Fetch student counts per class
-        const counts = {}
-        for (const cls of data || []) {
-            const { count } = await supabase
-                .from('students')
-                .select('*', { count: 'exact', head: true })
-                .eq('class_id', cls.id)
-                .eq('status', 'active')
-            counts[cls.id] = count || 0
+            const classList = classesRes.data || []
+            const studentList = studentsRes.data || []
+
+            setClasses(classList)
+
+            // Compute student counts per class in memory
+            const counts = {}
+            for (const s of studentList) {
+                if (s.class_id) {
+                    counts[s.class_id] = (counts[s.class_id] || 0) + 1
+                }
+            }
+            setStudentCounts(counts)
+        } catch (err) {
+            console.error('Fetch classes exception:', err)
+        } finally {
+            setLoading(false)
         }
-        setStudentCounts(counts)
-        setLoading(false)
     }
 
     const handleSubmit = async () => {

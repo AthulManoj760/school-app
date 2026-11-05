@@ -67,17 +67,23 @@ export default function Fees() {
 
     const fetchPayments = async () => {
         setLoading(true)
-        const { data } = await supabase
-            .from('fee_payments')
-            .select(`
-        *,
-        students(profiles(full_name), roll_number, classes(name, section)),
-        fee_structure(fee_type, amount)
-      `)
-            .order('created_at', { ascending: false })
-            .limit(50)
-        setPayments(data || [])
-        setLoading(false)
+        try {
+            const { data, error } = await supabase
+                .from('fee_payments')
+                .select(`
+                    *,
+                    students(profiles(full_name), roll_number, classes(name, section)),
+                    fee_structure(fee_type, amount)
+                `)
+                .order('created_at', { ascending: false })
+                .limit(50)
+            if (error) console.error('Fetch payments error:', error)
+            setPayments(data || [])
+        } catch (err) {
+            console.error('Fetch payments exception:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handleAddPayment = async () => {

@@ -28,11 +28,12 @@ function RoleRoute() {
     </div>
   )
 
-  if (!user) return <Navigate to="/login" />
+  if (!user) return <Navigate to="/login" replace />
 
-  if (profile?.role === 'student') return <Navigate to="/student-dashboard" />
-  if (profile?.role === 'teacher') return <Navigate to="/teacher-dashboard" />
-  return <Navigate to="/dashboard" />
+  const role = profile?.role || 'admin'
+  if (role === 'student') return <Navigate to="/student-dashboard" replace />
+  if (role === 'teacher') return <Navigate to="/teacher-dashboard" replace />
+  return <Navigate to="/dashboard" replace />
 }
 
 function ProtectedRoute({ children, allowedRoles }) {
@@ -44,12 +45,13 @@ function ProtectedRoute({ children, allowedRoles }) {
     </div>
   )
 
-  if (!user) return <Navigate to="/login" />
+  if (!user) return <Navigate to="/login" replace />
 
-  if (allowedRoles && !allowedRoles.includes(profile?.role)) {
-    if (profile?.role === 'student') return <Navigate to="/student-dashboard" />
-    if (profile?.role === 'teacher') return <Navigate to="/teacher-dashboard" />
-    return <Navigate to="/dashboard" />
+  const role = profile?.role || 'admin'
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    if (role === 'student') return <Navigate to="/student-dashboard" replace />
+    if (role === 'teacher') return <Navigate to="/teacher-dashboard" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return children
@@ -87,7 +89,7 @@ export default function App() {
           <Route path="/teacher-dashboard" element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

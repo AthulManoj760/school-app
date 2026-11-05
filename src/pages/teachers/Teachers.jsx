@@ -26,12 +26,21 @@ export default function Teachers() {
 
     const fetchTeachers = async () => {
         setLoading(true)
-        const { data } = await supabase
-            .from('teachers')
-            .select('*, profiles(full_name, phone, photo_url)')
-            .order('created_at', { ascending: false })
-        setTeachers(data || [])
-        setLoading(false)
+        try {
+            const { data, error } = await supabase
+                .from('teachers')
+                .select('*, profiles(full_name, phone, photo_url)')
+                .order('created_at', { ascending: false })
+            if (error) {
+                console.error('Fetch teachers error:', error)
+            } else {
+                setTeachers(data || [])
+            }
+        } catch (err) {
+            console.error('Fetch teachers exception:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handleSubmit = async () => {

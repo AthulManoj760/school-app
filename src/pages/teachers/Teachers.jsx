@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
-import { supabase } from '../../supabase'
+import { supabase, createIsolatedAuthClient } from '../../supabase'
 import toast from 'react-hot-toast'
 import { UserPlus, Search, UserCircle, Phone, GraduationCap, CalendarDays, Edit, Trash2, X } from 'lucide-react'
 
@@ -14,6 +14,8 @@ export default function Teachers() {
 
     const [form, setForm] = useState({
         full_name: '',
+        email: '',
+        password: '',
         phone: '',
         subject: '',
         qualification: '',
@@ -73,34 +75,60 @@ export default function Teachers() {
                 if (teacherError) throw teacherError
                 toast.success('Teacher updated!')
             } else {
-                // Create profile
-                const profileId = crypto.randomUUID()
-                const { error: profileError } = await supabase
+                let profileId = crypto.randomUUID()
+                let clientToUse = supabase
+
+                if (form.email && form.password) {
+                    if (form.password.length < 6) {
+                        toast.error('Password must be at least 6 characters')
+                        setSaving(false)
+                        return
+                    }
+                    const authClient = createIsolatedAuthClient()
+                    const { data: authData, error: authError } = await authClient.auth.signUp({
+                        email: form.email.trim(),
+                        password: form.password,
+                        options: {
+                            data: {
+                                full_name: form.full_name,
+                                role: 'teacher'
+                            }
+                        }
+                    })
+                    if (authError) throw authError
+                    if (authData?.user) {
+                        profileId = authData.user.id
+                        clientToUse = authClient
+                    }
+                }
+
+                // Create profile using appropriate client (authClient satisfies RLS)
+                const { error: profileError } = await clientToUse
                     .from('profiles')
                     .insert({
                         id: profileId,
                         full_name: form.full_name,
-                        phone: form.phone,
+                        phone: form.phone || null,
                         role: 'teacher',
                     })
                 if (profileError) throw profileError
 
-                // Create teacher
-                const { error: teacherError } = await supabase
+                // Create teacher using appropriate client (authClient satisfies RLS)
+                const { error: teacherError } = await clientToUse
                     .from('teachers')
                     .insert({
                         profile_id: profileId,
-                        subject: form.subject,
-                        qualification: form.qualification,
+                        subject: form.subject || null,
+                        qualification: form.qualification || null,
                         joining_date: form.joining_date || null,
                     })
                 if (teacherError) throw teacherError
-                toast.success('Teacher added!')
+                toast.success('Teacher added successfully!')
             }
 
             setShowModal(false)
             setEditingTeacher(null)
-            setForm({ full_name: '', phone: '', subject: '', qualification: '', joining_date: '' })
+            setForm({ full_name: '', email: '', password: '', phone: '', subject: '', qualification: '', joining_date: '' })
             fetchTeachers()
         } catch (err) {
             toast.error(err.message)
@@ -275,6 +303,30 @@ export default function Teachers() {
                                     placeholder="John Smith"
                                 />
                             </div>
+                            {!editingTeacher && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Login Email</label>
+                                        <input
+                                            type="email"
+                                            value={form.email}
+                                            onChange={e => setForm({ ...form, email: e.target.value })}
+                                            className="input-glass"
+                                            placeholder="teacher@school.com"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Password</label>
+                                        <input
+                                            type="password"
+                                            value={form.password}
+                                            onChange={e => setForm({ ...form, password: e.target.value })}
+                                            className="input-glass"
+                                            placeholder="Min 6 characters"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Phone</label>
                                 <input

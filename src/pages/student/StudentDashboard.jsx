@@ -26,7 +26,7 @@ export default function StudentDashboard() {
                 .from('students')
                 .select('*, classes(name, section)')
                 .eq('profile_id', profile.id)
-                .single()
+                .maybeSingle()
             setStudent(studentData)
 
             if (studentData) {

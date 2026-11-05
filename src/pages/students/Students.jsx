@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
-import { supabase } from '../../supabase'
+import { supabase, createIsolatedAuthClient } from '../../supabase'
 import toast from 'react-hot-toast'
 import {
     UserPlus, Search, GraduationCap, Edit, Trash2, Building2, Phone, X
@@ -274,35 +274,66 @@ function StudentModal({ classes, editingStudent, onClose, onSuccess }) {
 
                 toast.success('Student updated successfully!')
             } else {
-                const { data: profileData, error: profileError } = await supabase
+                if (!form.email || !form.password) {
+                    toast.error('Email and password are required for new students')
+                    setLoading(false)
+                    return
+                }
+                if (form.password.length < 6) {
+                    toast.error('Password must be at least 6 characters')
+                    setLoading(false)
+                    return
+                }
+
+                // 1. Create auth user in Supabase Auth via isolated client
+                const authClient = createIsolatedAuthClient()
+                const { data: authData, error: authError } = await authClient.auth.signUp({
+                    email: form.email.trim(),
+                    password: form.password,
+                    options: {
+                        data: {
+                            full_name: form.full_name,
+                            role: 'student'
+                        }
+                    }
+                })
+
+                if (authError) throw authError
+                if (!authData?.user) throw new Error('Failed to create student account')
+
+                const profileId = authData.user.id
+
+                // 2. Insert profile row with student role using authClient
+                // (Must use authClient because RLS policy requires auth.uid() == id)
+                const { error: profileError } = await authClient
                     .from('profiles')
                     .insert({
-                        id: crypto.randomUUID(),
+                        id: profileId,
                         full_name: form.full_name,
-                        phone: form.phone,
+                        phone: form.phone || null,
                         role: 'student',
                     })
-                    .select()
-                    .single()
 
                 if (profileError) throw profileError
 
-                const { error: studentError } = await supabase.from('students').insert({
-                    profile_id: profileData.id,
+                // 3. Insert student record using authClient
+                // (Must use authClient because RLS policy requires auth.uid() == profile_id)
+                const { error: studentError } = await authClient.from('students').insert({
+                    profile_id: profileId,
                     class_id: form.class_id || null,
-                    roll_number: form.roll_number,
+                    roll_number: form.roll_number || null,
                     date_of_birth: form.date_of_birth || null,
-                    gender: form.gender,
-                    blood_group: form.blood_group,
-                    address: form.address,
-                    medical_notes: form.medical_notes,
-                    emergency_contact: form.emergency_contact,
-                    emergency_phone: form.emergency_phone,
+                    gender: form.gender || null,
+                    blood_group: form.blood_group || null,
+                    address: form.address || null,
+                    medical_notes: form.medical_notes || null,
+                    emergency_contact: form.emergency_contact || null,
+                    emergency_phone: form.emergency_phone || null,
                     status: 'active',
                 })
                 if (studentError) throw studentError
 
-                toast.success('Student added successfully!')
+                toast.success('Student registered! They can now log in.')
             }
             onSuccess()
         } catch (err) {
